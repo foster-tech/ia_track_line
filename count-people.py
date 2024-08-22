@@ -38,18 +38,18 @@ def capture_screenshot(frame, filename='screenshot.png'):
 model = YOLO('yolov8n.pt')  # Replace with the path to your YOLOv8 model
 
 # RTSP link of the video stream
-rtsp_link = 'http://takemotopiano.aa1.netvolante.jp:8190/nphMotionJpeg?Resolution=640x480&Quality=Standard&Framerate=30'
-# rtsp_link = 'rtsp://tijuco:T2024@189.91.55.194:3554/cam/realmonitor?channel=1&subtype=0'
+# rtsp_link = 'http://takemotopiano.aa1.netvolante.jp:8190/nphMotionJpeg?Resolution=640x480&Quality=Standard&Framerate=30'
+rtsp_link = 'rtsp://tijuco:T2024@189.91.55.194:3554/cam/realmonitor?channel=1&subtype=0'
 # rtsp_link = 'rtsp://46.151.101.134:8082/?action=stream'
 
 # Open a video capture object
 cap = cv2.VideoCapture(rtsp_link)
 
-# Export the model
-ov_model = model.export(format="openvino")  # creates 'yolov8n_openvino_model/'
+# # Export the model
+model.export(format="openvino")  # creates 'yolov8n_openvino_model/'
 
 # Load the exported OpenVINO model
-ov_model = YOLO("models/yolov8n_openvino_model/")
+ov_model = YOLO("yolov8n_openvino_model/")
 
 if not cap.isOpened():
     print("Error: Could not open video stream.")
@@ -78,24 +78,24 @@ while True:
         # print(r.boxes)  # print the Boxes object containing the detection bounding boxes   
         boxes = r.boxes
         for box in boxes:
-            print(box.xyxy)
+            # print(box.xyxy)
             c = box.cls
             obj = model.names[int(c)]
             if obj == 'person':
                 count_person = count_person + 1
 
-            for b in box.xyxy:  # xyxy format
-                x1, y1, x2, y2 = b
-                label = obj  # Get class name
-                color = (0, 255, 0)  # Bounding box color (green)
+                for b in box.xyxy:  # xyxy format
+                    x1, y1, x2, y2 = b
+                    label = obj  # Get class name
+                    color = (0, 255, 0)  # Bounding box color (green)
 
-                # Draw bounding box
-                cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
-                
-                # Draw label
-                # label_text = f'{label} {conf:.2f}'
-                label_text = f'{label}'
-                cv2.putText(frame, label_text, (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                    # Draw bounding box
+                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+                    
+                    # Draw label
+                    # label_text = f'{label} {conf:.2f}'
+                    label_text = f'{label}'
+                    cv2.putText(frame, label_text, (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 
             # # Draw bounding boxes and labels on the frame
@@ -104,7 +104,7 @@ while True:
             #     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
             #     cv2.putText(frame, f'Person {index+1}', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)    
 
-    # print(count_person)
+    print(count_person)
     # # Process results
     # detections = results.xyxy[0]  # Get detections in pandas dataframe format
     
@@ -130,7 +130,7 @@ while True:
     cv2.imshow('Video Stream', frame)
     # cv2.imshow('Video Stream', frame_with_boxes)
 
-    if ( count_person >= 0 ):
+    if ( count_person >= 1 ):
         current_time = time.time()
 
         print(current_time - notifier.last_sent_time)
