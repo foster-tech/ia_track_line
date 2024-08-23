@@ -12,7 +12,11 @@ class EmailNotifier:
         self.api_secret = os.getenv("MAILJET_API_SECRET_KEY")
         self.from_email = os.getenv("MAILJET_FROM_EMAIL")
         self.from_name = os.getenv("MAILJET_FROM_NAME")
-        self.interval_seconds = int(os.getenv("MAILJET_INTERVAL")) + 3 # Removing average time to send email 
+        self.to_email = os.getenv("MAILJET_TO_EMAIL")
+        self.to_name = os.getenv("MAILJET_TO_NAME")
+        self.cc_email = os.getenv("MAILJET_CC_EMAIL")
+        self.cc_name = os.getenv("MAILJET_CC_NAME")
+        self.interval_seconds = int(os.getenv("MAILJET_INTERVAL")) + 2 # Increment average time to send email 
         self.last_sent_time = 0   
 
     def send_email(self, attachment_path, to_email, to_name, subject, text):
@@ -42,16 +46,16 @@ class EmailNotifier:
                     },
                     "To": [
                         {
-                            "Email": to_email,
-                            "Name": to_name
+                            "Email": self.to_email,
+                            "Name": self.to_name
                         }
                     ],
-                    # "Cc": [
-                    #     {
-                    #         "Email": "eduardo.ventura@intelicitybr.com.br",
-                    #         "Name": "Eduardo"
-                    #     }
-                    # ],
+                    "Cc": [
+                        {
+                            "Email": self.cc_email,
+                            "Name": self.cc_name
+                        }
+                    ],
                     "Subject": subject,
                     "TextPart": text,
                     "HTMLPart": f'<h3>{text}</h3>',
@@ -67,14 +71,14 @@ class EmailNotifier:
         }
 
         # Send email
-        # result = mailjet.send.create(data=data)
+        result = mailjet.send.create(data=data)
 
         # Update the last sent time
         self.last_sent_time = current_time
 
-        # # Print response
-        # print(result.status_code)
-        # print(result.json())
+        # Print response
+        print(result.status_code)
+        print(result.json())
         # # return True
 
         # else:
