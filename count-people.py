@@ -1,6 +1,10 @@
-import cv2, time, os
+import cv2, time, os, datetime
 from ultralytics import YOLO
 from send_email import EmailNotifier
+import numpy as np
+
+# Define the polygonal area of interest (AOI)
+area_of_interest = np.array([[411, 89], [610, 101], [1118, 719], [449, 720]])
 
 def capture_screenshot(frame, filename='screenshot.png'):
     # Save the screenshot in a file and return the name
@@ -47,6 +51,7 @@ while True:
     if not results or len(results) == 0:
         print("nada")
     
+    allow_send_mail = False
     count_person = 0
 
     for r in results:
@@ -56,6 +61,7 @@ while True:
             # print(box.xyxy)
             c = box.cls
             obj = model.names[int(c)]
+            # if (obj == 'person' or obj == 'car' or obj == 'truck'):
             if (obj == 'person'):
                 count_person = count_person + 1
 
@@ -66,6 +72,16 @@ while True:
 
                     # Draw bounding box
                     cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+
+                    # Define the center point of the bounding box
+                    center_x = int((x1 + x2) / 2)
+                    center_y = int((y1 + y2) / 2)
+                    center_point = (center_x, center_y)
+
+                    # Check if the center point is inside the area of interest
+                    if cv2.pointPolygonTest(area_of_interest, center_point, False) >= 0:
+                        allow_send_mail = True
+                        print(f"{label} entered the area")
                     
                     # Draw label
                     # label_text = f'{label} {conf:.2f}'
@@ -73,6 +89,13 @@ while True:
                     cv2.putText(frame, label_text, (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
     print(count_person)
+    current_time = time.time()
+    current_dt = datetime.datetime.fromtimestamp(current_time).strftime('%H:%M:%S')
+    print(current_dt)
+    # print(time.localtime(current_time))
+
+    # Draw the area of interest on the frame
+    cv2.polylines(frame, [area_of_interest], isClosed=True, color=(0, 0, 255), thickness=2)
     
     # Display the number of people detected
     cv2.putText(frame, f'Pessoas encontradas: {count_person}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
@@ -80,8 +103,9 @@ while True:
     # Show the frame
     cv2.imshow('Video Stream', frame)
 
-    if ( count_person >= 1 ):
-        current_time = time.time()
+    # if ( count_person >= 1 ):
+    if ( allow_send_mail ):
+        
 
         print(current_time - notifier.last_sent_time)
         print(notifier.interval_seconds)
@@ -93,7 +117,8 @@ while True:
             print(attachment_path)
             # Send email with attachment
             subject = f'ALERTA! Pessoa encontrada no local. Quantidade: {count_person} '
-            result = notifier.send_email(attachment_path, "", "", subject, subject)
+            text = f"{label} entrou na area marcada"
+            result = notifier.send_email(attachment_path, "", "", subject, text)
 
         else:
             # Check the remaining time and print in the log 
