@@ -16,6 +16,7 @@ opencv-python = "*"
 mailjet-rest = "*"
 python-dotenv = "*"
 pandas = "*"
+termcolor = "*"
 
 [dev-packages]
 

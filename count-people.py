@@ -2,6 +2,7 @@ import cv2, time, os, datetime
 from ultralytics import YOLO
 from send_email import EmailNotifier
 import numpy as np
+from termcolor import colored
 
 # Define the polygonal area of interest (AOI)
 area_of_interest = np.array([[411, 89], [610, 101], [1118, 719], [449, 720]])
@@ -42,8 +43,12 @@ while True:
     ret, frame = cap.read()
     
     if not ret:
-        print("Error: Failed to retrieve frame.")
-        break
+        # print("Error: Failed to retrieve frame. Try to get cap again")
+        print(colored('Warning: Failed to retrieve frame. Try to get cap again', 'yellow'))
+        # print(f"{bcolors.WARNING}Warning: Failed to retrieve frame. Try to get cap again{bcolors.ENDC}")
+        # Open a video capture object
+        cap = cv2.VideoCapture(rtsp_link)
+        continue
 
     # Perform inference
     results = ov_model(frame)
@@ -91,7 +96,8 @@ while True:
     print(count_person)
     current_time = time.time()
     current_dt = datetime.datetime.fromtimestamp(current_time).strftime('%H:%M:%S')
-    print(current_dt)
+    # print(current_dt)
+    print(colored(current_dt, 'yellow'))
     # print(time.localtime(current_time))
 
     # Draw the area of interest on the frame
