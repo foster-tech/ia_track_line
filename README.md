@@ -16,10 +16,10 @@
 - Como instalar e executar:
     - PIPENV:
         - pipenv install --python 3.12 (Para criar o ambiente virtual pipenv)
-        - Defina a area com o criador de area (area_creator.html) e alterando a variável area_of_interest do arquivo count-people.py
+        - Defina a area com o criador de area (area_creator.html) e alterando a variável area_of_interest do arquivo find-people.py
         - Defina os parametros para os envios de e-mails e o link RTSP no arquivo .env
         - pipenv shell (Para entrar no ambiente criado)
-        - python count-people.py (Para executar o serviço ai_find_people)
+        - python find-people.py (Para executar o serviço ai_find_people)
 
 - Dificuldades encontradas durante a criação do serviço:
     - Como executar as inferencias do Ultralytics com YOLOv8 no openVINO (para cada frame)

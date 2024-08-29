@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Upload and Area Selection</title>
+    <title>Criador de area</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,19 +11,21 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            /* height: 100vh; */
             margin: 0;
             background-color: #f0f0f0;
         }
         #canvas {
             border: 2px solid #000;
             cursor: crosshair;
+            /* height: 400px; */
+            margin: 20px;
         }
         #output {
             margin-top: 20px;
         }
         #controls {
-            margin-top: 10px;
+            margin: 20px;
         }
         button {
             padding: 10px 20px;
@@ -40,13 +42,13 @@
 </head>
 <body>
 
-    <h2>Upload Image and Draw Area</h2>
+    <h2>Faça o upload de um frame e coloque 4 pontos (sentido horário) para definir uma area</h2>
     <input type="file" id="imageUpload" accept="image/*">
     <canvas id="canvas"></canvas>
+    <div id="output"></div>
     <div id="controls">
         <button id="resetButton">Reset</button>
     </div>
-    <div id="output"></div>
 
     <script>
         const imageUpload = document.getElementById('imageUpload');
