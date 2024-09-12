@@ -1,6 +1,6 @@
-# ai_find_people
+# ai_track_line
 
-- Serviço de monitoramento de streaming de video RTSP usado para identificar se alguma pessoa entrou na area demarcada.
+- Serviço de monitoramento de streaming de video RTSP usado para identificar se alguma pessoa se moveu no local.
 
 - Requisitos:
     - Python 3.12
@@ -19,7 +19,7 @@
         - Defina a area com o criador de area (area_creator.html) e alterando a variável area_of_interest do arquivo find-people.py
         - Defina os parametros para os envios de e-mails e o link RTSP no arquivo .env
         - pipenv shell (Para entrar no ambiente criado)
-        - python find-people.py (Para executar o serviço ai_find_people)
+        - python detect-line-track.py (Para executar o serviço ai_track_line)
 
 - Dificuldades encontradas durante a criação do serviço:
     - Como executar as inferencias do Ultralytics com YOLOv8 no openVINO (para cada frame)

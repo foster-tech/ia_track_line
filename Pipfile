@@ -17,6 +17,7 @@ mailjet-rest = "*"
 python-dotenv = "*"
 pandas = "*"
 termcolor = "*"
+shapely = "*"
 
 [dev-packages]
 

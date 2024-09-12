@@ -50,12 +50,12 @@ class EmailNotifier:
                             "Name": self.to_name
                         }
                     ],
-                    "Cc": [
-                        {
-                            "Email": self.cc_email,
-                            "Name": self.cc_name
-                        }
-                    ],
+                    # "Cc": [
+                    #     {
+                    #         "Email": self.cc_email,
+                    #         "Name": self.cc_name
+                    #     }
+                    # ],
                     "Subject": subject,
                     "TextPart": text,
                     "HTMLPart": f'<h3>{text}</h3>',

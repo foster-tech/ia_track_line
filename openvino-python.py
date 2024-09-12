@@ -29,4 +29,4 @@ input_data = np.expand_dims(image_normalized, axis=0)  # Add batch dimension
 result = compiled_model([input_data])[0]
 
 # # Post-process and visualize results (this will depend on your specific use case)
-# print("Detection results:", result)
+print("Detection results:", result)
