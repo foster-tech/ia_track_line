@@ -4,11 +4,7 @@ from send_email import EmailNotifier
 import numpy as np
 from termcolor import colored
 from collections import defaultdict
-from shapely.geometry import Polygon
-from shapely.geometry.point import Point
 from ultralytics.utils.plotting import Annotator, colors
-
-track_history = defaultdict(list)
 
 # Define a dictionary to store object tracking paths
 tracking_paths = defaultdict(list)
@@ -47,16 +43,7 @@ USER = os.getenv("RTSP_USER")
 PASS = os.getenv("RTSP_PASS")
 
 # RTSP link of the video stream
-# rtsp_link = 'http://takemotopiano.aa1.netvolante.jp:8190/nphMotionJpeg?Resolution=640x480&Quality=Standard&Framerate=30'
-# rtsp_link = 'http://camera.buffalotrace.com/mjpg/video.mjpg'
-# rtsp_link = 'http://61.211.241.239/nphMotionJpeg?Resolution=640x480&Quality=Standard'
-rtsp_link = '../ultralytics/files/dutra.mp4' # Dutra Saida SP
 rtsp_link = f'rtsp://{USER}:{PASS}@{IP}:{PORT}'
-
-# Track the state of the objects
-object_states = {}  # Stores the state of each object
-
-object_ids = {}
 
 # # Export the model
 model.export(format="openvino")  # creates 'yolov8n_openvino_model/'
@@ -104,7 +91,7 @@ while True:
         annotator = Annotator(frame, line_width=2, example=str(names))
 
         for box, track_id, cls in zip(boxes, track_ids, clss):
-            label = str(track_id) + ' - ' + str(names[cls])
+            label = str(names[cls]) + ' - ' + str(track_id)
             annotator.box_label(box, label, color=colors(cls, True))
             b1 = (box[0] + box[2]) / 2
             b2 = (box[1] + box[3]) / 2
@@ -129,9 +116,9 @@ while True:
     # print(current_dt)
     print(colored(current_dt, 'yellow'))
 
-    # # Display the number of people detected
-    cv2.putText(frame, f'Objetos que se moveram:', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    cv2.putText(frame, f'{object_ids}', (40, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    # # # Display the number of people detected
+    # cv2.putText(frame, f'Objetos que se moveram:', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    # cv2.putText(frame, f'{object_ids}', (40, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     cv2.imshow('Video Stream', frame)
 
     if ( allow_send_mail ):
@@ -144,8 +131,8 @@ while True:
             attachment_path = capture_screenshot(frame)
             print(attachment_path)
             # Send email with attachment
-            subject = f'ALERTA! Uma pessoa detectada.'
-            text = f"{label} se movendo no local."
+            subject = f'ALERTA! Camera {notifier.camera_name}'
+            text = f"{label} foi detectado se movendo no local."
             result = notifier.send_email(attachment_path, "", "", subject, text)
 
         else:

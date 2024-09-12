@@ -17,6 +17,7 @@ class EmailNotifier:
         self.cc_email = os.getenv("MAILJET_CC_EMAIL")
         self.cc_name = os.getenv("MAILJET_CC_NAME")
         self.interval_seconds = int(os.getenv("MAILJET_INTERVAL")) + 2 # Increment average time to send email 
+        self.camera_name = os.getenv("CAMERA_NAME")
         self.last_sent_time = 0   
 
     def send_email(self, attachment_path, to_email, to_name, subject, text):
@@ -32,6 +33,10 @@ class EmailNotifier:
 
         with open(attachment_path, "rb") as attachment_file:
             attachment_base64 = base64.b64encode(attachment_file.read()).decode('utf-8')
+
+        # Read the HTML template from a file
+        with open('mail_template.html', 'r') as file:
+            html_content = file.read()    
 
         # Initialize Mailjet client
         mailjet = Client(auth=(self.api_key, self.api_secret), version='v3.1')
@@ -58,7 +63,11 @@ class EmailNotifier:
                     # ],
                     "Subject": subject,
                     "TextPart": text,
-                    "HTMLPart": f'<h3>{text}</h3>',
+                    "HTMLPart": html_content,
+                    # Optional: Include variables for dynamic content
+                    "Variables": {
+                        "content_text": text
+                    },
                     "Attachments": [
                         {
                             "ContentType": "image/png",
