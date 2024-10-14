@@ -5,6 +5,7 @@ import numpy as np
 from termcolor import colored
 from collections import defaultdict
 from ultralytics.utils.plotting import Annotator, colors
+from openvino.runtime import Core
 
 # Define a dictionary to store object tracking paths
 tracking_paths = defaultdict(list)
@@ -34,9 +35,6 @@ def capture_screenshot(frame, filename='screenshot.png'):
     print(f'Screenshot saved as {filename}')
     return filename 
 
-# Load the YOLOv8 model
-model = YOLO('yolov8n.pt')  # Replace with the path to your YOLOv8 model
-
 IP = os.getenv("RTSP_IP")
 PORT = os.getenv("RTSP_PORT")
 USER = os.getenv("RTSP_USER")
@@ -45,12 +43,30 @@ PASS = os.getenv("RTSP_PASS")
 # RTSP link of the video stream
 rtsp_link = f'rtsp://{USER}:{PASS}@{IP}:{PORT}'
 
-# # Export the model
-model.export(format="openvino")  # creates 'yolov8n_openvino_model/'
+# # Load the YOLOv8 model
+# model = YOLO('yolov8n.pt')  # Replace with the path to your YOLOv8 model
 
-# Load the exported OpenVINO model
-ov_model = YOLO("yolov8n_openvino_model/")
-# ov_model = YOLO("yolov8n-seg_openvino_model/")
+# # # Export the model
+# model.export(format="openvino")  # creates 'yolov8n_openvino_model/'
+
+# Initialize the inference engine
+core = Core()
+
+# Load the network
+model_path = 'yolov8n_openvino/yolov8n.xml'
+# weights_path = 'models/yolov8n_openvino_model/yolov8n.bin'
+# net = core.read_network(model=model_path, weights=weights_path)
+model = core.read_model(model=model_path)
+
+# Load the model to the CPU (or other available devices like GPU, MYRIAD, etc.)
+ov_model = core.compile_model(model=model, device_name='CPU')
+
+# # # Export the model
+# model.export(format="openvino")  # creates 'yolov8n_openvino_model/'
+
+# # Load the exported OpenVINO model
+# ov_model = YOLO("yolov8n_openvino_model/")
+# # ov_model = YOLO("yolov8n-seg_openvino_model/")
 
 notifier = EmailNotifier()    
 
@@ -77,9 +93,8 @@ while True:
     # Run object tracking on the frame
     # results = tracker.update(frame)
     results = ov_model.track(frame, persist=True)
-    print("Detection results:", results)
 
-    # Extract classes names
+   # Extract classes names
     names = model.model.names
 
     if results[0].boxes.id is not None:

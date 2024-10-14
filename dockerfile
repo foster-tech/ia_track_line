@@ -4,7 +4,7 @@ FROM python:3.12-slim
 # Define o diretório de trabalho no container
 WORKDIR /app
 
-# Instala dependências do sistema para o Pipenv e Python
+# Instala dependências do sistema para o Python
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
@@ -13,17 +13,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y    
 
-# Instala o Pipenv
-RUN pip install pipenv
+# Install pip and any additional dependencies
+RUN pip install --upgrade pip
 
-# Copia o Pipfile e o Pipfile.lock para o diretório de trabalho
-COPY Pipfile Pipfile.lock /app/
+# Copy the requirements.txt to the working directory
+COPY requirements.txt .
 
-# Instala dependências Python em um ambiente virtual criado pelo Pipenv
-RUN pipenv install --deploy --system
+# Install the dependencies from requirements.txt
+RUN pip install -r requirements.txt
 
-# Copia o restante do código da aplicação para o diretório de trabalho
-COPY . /app
+# Copy the rest of the application code to the container
+COPY . .
+
 
 # Especifica o comando para rodar a aplicação
 # Altere "python app.py" para o comando para rodar sua aplicação específica
